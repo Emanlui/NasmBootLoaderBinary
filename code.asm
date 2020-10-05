@@ -62,11 +62,34 @@ randomnumber:		; This function generates a random number and store in on dl (The
 	
 	mov ax, dx
 	xor dx, dx
-	mov cx, 39
-	div cx
+	mov cx, 4
+	div cx		; Right now dl has a "random" number 
 	
-	cmp dl, 39	; Right now dl has a "random" number 
+	mov bl, dl	; I move DX  to BL, because Bl is never used in int 1ah
+	
+	cmp bl, 3	; It must be lower than 4
 	jg randomnumber ; But it must be greate
+
+	
+	
+	xor ah, ah
+	xor cx, cx	; We clear everything except for al and bx (because bl has the random)
+	xor dx, dx
+	
+	mov ah, 00h	; This interrupt calls the time on the system 
+	int 1ah
+	
+	mov ax, dx
+	xor dx, dx
+	mov cx, 10
+	div cx		; bl has a random and dx also
+	
+	mov al, bl	; I move this to al because mul only works with al
+	mov cl, 10	; We multiply al with 10, remember, now al has a random number from 0-3
+	mul cl
+	
+	add al, dl	; And finally we add the other random
+	mov dl, al	; Example	al = bl; al is multiply by 10 and the we add the 0-10 random number
 	
 	ret
 
